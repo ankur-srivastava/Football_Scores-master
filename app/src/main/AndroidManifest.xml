@@ -45,6 +45,11 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/football_app_widget_info"/>
         </receiver>
+
+        <service
+            android:name=".ScoreWidgetService"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

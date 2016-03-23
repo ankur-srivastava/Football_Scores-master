@@ -3,6 +3,7 @@ package barqsoft.footballscores;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 /**
@@ -10,16 +11,20 @@ import android.widget.RemoteViews;
  */
 public class FootballAppWidget extends AppWidgetProvider {
 
+    private static final String TAG = FootballAppWidget.class.getSimpleName();
+    public static final String SERVICE_DATA_UPDATED = "com.soccer.SERVICE_DATA_UPDATED";
+
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
         CharSequence widgetText = context.getString(R.string.appwidget_text);
+        ScoreWidgetService.startActionWidget(context, appWidgetManager, appWidgetId);
         // Construct the RemoteViews object
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.football_app_widget);
-        views.setTextViewText(R.id.appwidget_text, widgetText);
+        //RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.football_app_widget);
+        //views.setTextViewText(R.id.appwidget_text, widgetText);
 
         // Instruct the widget manager to update the widget
-        appWidgetManager.updateAppWidget(appWidgetId, views);
+        //appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
     @Override

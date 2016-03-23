@@ -26,6 +26,9 @@ public class scoresAdapter extends CursorAdapter
     public static final int COL_MATCHTIME = 2;
     public double detail_match_id = 0;
     private String FOOTBALL_SCORES_HASHTAG = "#Football_Scores";
+    //Ankur - Constant to send broadcast to widget
+    public static final String ACTION_DATA_UPDATED = "com.soccer.ACTION_DATA_UPDATED";
+
     public scoresAdapter(Context context,Cursor cursor,int flags)
     {
         super(context,cursor,flags);
