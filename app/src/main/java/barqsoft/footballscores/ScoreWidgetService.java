@@ -3,10 +3,8 @@ package barqsoft.footballscores;
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
@@ -25,7 +23,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.Vector;
 
 import barqsoft.footballscores.service.myFetchService;
 
@@ -35,7 +32,6 @@ import barqsoft.footballscores.service.myFetchService;
  */
 public class ScoreWidgetService extends IntentService {
     private static final String ACTION_WIDGET = "barqsoft.footballscores.action.ACTION_WIDGET";
-    private static final String EXTRA_PARAM = "barqsoft.footballscores.extra.EXTRA_PARAM";
     private static final String TAG = ScoreWidgetService.class.getSimpleName();
 
     Handler mHandler;
@@ -62,35 +58,25 @@ public class ScoreWidgetService extends IntentService {
     public static void startActionWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         mAppWidgetManager = appWidgetManager;
         mAppWidgetId = appWidgetId;
+
         Intent intent = new Intent(context, ScoreWidgetService.class);
         intent.setAction(ACTION_WIDGET);
-        //intent.putExtra(EXTRA_PARAM, param);
         context.startService(intent);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.v(TAG, "In onHandleIntent");
-
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this,
-                FootballAppWidget.class));
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this,FootballAppWidget.class));
 
-
-        //https://github.com/udacity/Advanced_Android_Development/blob/master/app/src/main/java/com/example/android/sunshine/app/widget/TodayWidgetIntentService.java
-        //Step 1 - Get Cursor which will get the data from DB
-        //Step 2 - Use Cursor to populate the Remote View
-
-        // Get today's data from the ContentProvider
+        /*
+        https://github.com/udacity/Advanced_Android_Development/blob/master/app/src/main/java/com/example/android/sunshine/
+            app/widget/TodayWidgetIntentService.java
+        */
         getData("n2");
-
-        // Perform this loop procedure for each Today widget
-        // Extract the data from the Cursor
-        //widget_home_name, widget_score_textview, widget_data_textview, widget_away_name
 
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(getPackageName(), R.layout.football_app_widget);
-
             String scores = Utilies.getScores(COL_HOME_GOALS_VAL, COL_AWAY_GOALS_VAL);
 
             views.setTextViewText(R.id.widget_home_name, widget_home_name_val);
@@ -98,35 +84,11 @@ public class ScoreWidgetService extends IntentService {
             views.setTextViewText(R.id.widget_score_textview, scores);
             views.setTextViewText(R.id.widget_data_textview, mDate);
 
-            // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }
 
-    private void update_scores(Context context) {
-        Intent service_start = new Intent(context, myFetchService.class);
-        context.startService(service_start);
-    }
-
-    private void updateUI(){
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                //Toast.makeText(getApplicationContext(), "In UI thread", Toast.LENGTH_SHORT).show();
-
-                RemoteViews views = new RemoteViews(getApplicationContext().getPackageName(), R.layout.football_app_widget);
-
-
-                // Instruct the widget manager to update the widget
-                mAppWidgetManager.updateAppWidget(mAppWidgetId, views);
-            }
-        });
-    }
-
-    //Custom Code
-
     private void getData (String timeFrame) {
-        Log.v(TAG, "In getData for "+timeFrame);
         final String BASE_URL = "http://api.football-data.org/alpha/fixtures";
         final String QUERY_TIME_FRAME = "timeFrame";
 
@@ -197,19 +159,20 @@ public class ScoreWidgetService extends IntentService {
     private void processJSONdata (String JSONdata,Context mContext, boolean isReal) {
         final String BUNDESLIGA1 = "394";
         final String BUNDESLIGA2 = "395";
-        final String LIGUE1 = "396";
-        final String LIGUE2 = "397";
         final String PREMIER_LEAGUE = "398";
         final String PRIMERA_DIVISION = "399";
-        final String SEGUNDA_DIVISION = "400";
         final String SERIE_A = "401";
+        //added by Ankur
+        final String EL1 = "425";
+        /*
+        final String SEGUNDA_DIVISION = "400";
+        final String LIGUE1 = "396";
+        final String LIGUE2 = "397";
         final String PRIMERA_LIGA = "402";
         final String Bundesliga3 = "403";
         final String EREDIVISIE = "404";
-
-        //added by Ankur
-        final String EL1 = "425";
-
+        final String MATCH_DAY = "matchday";
+        */
 
         final String SEASON_LINK = "http://api.football-data.org/alpha/soccerseasons/";
         final String MATCH_LINK = "http://api.football-data.org/alpha/fixtures/";
@@ -223,12 +186,10 @@ public class ScoreWidgetService extends IntentService {
         final String RESULT = "result";
         final String HOME_GOALS = "goalsHomeTeam";
         final String AWAY_GOALS = "goalsAwayTeam";
-        final String MATCH_DAY = "matchday";
 
         //Match data
         String League = null;
         String match_id = null;
-
 
         try {
             JSONArray matches = new JSONObject(JSONdata).getJSONArray(FIXTURES);
@@ -272,8 +233,6 @@ public class ScoreWidgetService extends IntentService {
                     widget_away_name_val = match_data.getString(AWAY_TEAM);
                     COL_HOME_GOALS_VAL = Integer.parseInt(match_data.getJSONObject(RESULT).getString(HOME_GOALS));
                     COL_AWAY_GOALS_VAL = Integer.parseInt(match_data.getJSONObject(RESULT).getString(AWAY_GOALS));
-
-                    Log.v(TAG, "Values - "+widget_home_name_val+" "+widget_away_name_val+" "+COL_HOME_GOALS_VAL+" "+COL_AWAY_GOALS_VAL+" "+mDate);
                 }
             //}
 
