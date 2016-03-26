@@ -17,7 +17,8 @@ public class FootballAppWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        CharSequence widgetText = context.getString(R.string.appwidget_text);
+        //CharSequence widgetText = context.getString(R.string.appwidget_text);
+        Log.v(TAG, "Calling service");
         ScoreWidgetService.startActionWidget(context, appWidgetManager, appWidgetId);
         // Construct the RemoteViews object
         //RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.football_app_widget);
