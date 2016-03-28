@@ -1,6 +1,7 @@
 package barqsoft.footballscores;
 
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -70,7 +71,7 @@ public class ScoreWidgetService extends IntentService {
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this,FootballAppWidget.class));
 
         /*
-        https://github.com/udacity/Advanced_Android_Development/blob/master/app/src/main/java/com/example/android/sunshine/
+        Reference - https://github.com/udacity/Advanced_Android_Development/blob/master/app/src/main/java/com/example/android/sunshine/
             app/widget/TodayWidgetIntentService.java
         */
         getData("n2");
@@ -84,10 +85,16 @@ public class ScoreWidgetService extends IntentService {
             views.setTextViewText(R.id.widget_score_textview, scores);
             views.setTextViewText(R.id.widget_data_textview, mDate);
 
+            // Create an Intent to launch MainActivity
+            Intent launchIntent = new Intent(this, MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);
+            views.setOnClickPendingIntent(R.id.widget_score_textview, pendingIntent);
+
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }
 
+    /*Ankur - Code from the myFetchService*/
     private void getData (String timeFrame) {
         final String BASE_URL = "http://api.football-data.org/alpha/fixtures";
         final String QUERY_TIME_FRAME = "timeFrame";
@@ -162,7 +169,7 @@ public class ScoreWidgetService extends IntentService {
         final String PREMIER_LEAGUE = "398";
         final String PRIMERA_DIVISION = "399";
         final String SERIE_A = "401";
-        //added by Ankur
+        //Code added by Ankur
         final String EL1 = "425";
         /*
         final String SEGUNDA_DIVISION = "400";
